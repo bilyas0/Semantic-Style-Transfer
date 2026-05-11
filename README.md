@@ -18,6 +18,9 @@ Bu projede amaç:
 - İnsan bölgesini mümkün olduğunca korumak,
 - Kullanıcının rahatlıkla kullanableceği bir arayüz ile sonucu üretmektir.
 
+
+<img width="835" height="722" alt="image" src="https://github.com/user-attachments/assets/73aa313d-c997-4f1b-b823-31dea484d437" />
+** Yurdumuz sevilen ozanı Neşet Ertaş üzerinde yaptığımız uygulama
 ---
 
 ## Kullanılan Yöntemler
