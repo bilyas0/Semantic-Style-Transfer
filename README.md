@@ -20,7 +20,8 @@ Bu projede amaç:
 
 
 <img width="835" height="722" alt="image" src="https://github.com/user-attachments/assets/73aa313d-c997-4f1b-b823-31dea484d437" />
-** Yurdumuz sevilen ozanı Neşet Ertaş saygı ve rahmetle anıyoruz**
+
+**Yurdumuz sevilen ozanı Neşet Ertaş saygı ve rahmetle anıyoruz**
 ---
 
 ## Kullanılan Yöntemler
