@@ -118,6 +118,9 @@ Arayüz açıldıktan sonra:
 
 Arayüz kullanımında `inputs/` klasörüne fotoğraf koymana gerek yoktur. Fotoğraflar doğrudan arayüzden yüklenir.
 
+<img width="800" height="450" alt="ezgif-2a612b8c10c2c535" src="https://github.com/user-attachments/assets/74d7d168-fda5-4937-a783-d62f9f1745b8" />
+
+
 ---
 
 ## Terminal ile Kullanım
