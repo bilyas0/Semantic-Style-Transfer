@@ -84,7 +84,7 @@ cd semantic-style-transfer
 Gerekli kütüphaneleri yükle:
 
 ```bash
-
+pip install -r requirements.txt
 
 ```
 
@@ -99,6 +99,8 @@ Streamlit arayüzünü başlat:
 ```bash
 streamlit run app.py
 ```
+<img width="1782" height="794" alt="image" src="https://github.com/user-attachments/assets/2e492786-77a2-4f79-8af9-dbfefbcf68b8" />
+
 
 Eğer `streamlit` komutu tanınmazsa şu komutu kullan:
 
