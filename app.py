@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import io
-import os
 from pathlib import Path
 
+import numpy as np
 import streamlit as st
 from PIL import Image
 
@@ -41,30 +41,76 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 # YARDIMCI FONKSİYONLAR
 # ============================================================
 
-def prepare_uploaded_image(uploaded_file, save_path: Path, image_size: int = IMAGE_SIZE) -> Image.Image:
+def prepare_uploaded_image(
+    uploaded_file,
+    save_path: Path,
+    image_size: int = IMAGE_SIZE
+) -> Image.Image:
     """
     Streamlit'ten yüklenen görseli okur, RGB'ye çevirir,
     sabit boyuta getirir ve PNG olarak kaydeder.
-
-    Colab'daki:
-        Image.open(path).convert("RGB")
-        img.resize((IMAGE_SIZE, IMAGE_SIZE))
-        img.save(...)
-    mantığının otomatikleştirilmiş halidir.
     """
-
     image = Image.open(uploaded_file).convert("RGB")
     image = image.resize((image_size, image_size))
-
     image.save(save_path)
-
     return image
 
 
-def pil_to_png_bytes(image: Image.Image) -> bytes:
+def to_pil_image(image_data) -> Image.Image:
     """
-    PIL görselini indirilebilir PNG byte verisine çevirir.
+    PIL Image veya numpy.ndarray formatındaki görüntüyü
+    güvenli şekilde PIL Image formatına çevirir.
+
+    Bu fonksiyon özellikle person_mask çıktısı numpy array
+    geldiğinde .save() hatasını engellemek için kullanılır.
     """
+    if isinstance(image_data, Image.Image):
+        return image_data
+
+    if isinstance(image_data, np.ndarray):
+        arr = image_data
+
+        # Float görüntü 0-1 aralığındaysa 0-255'e çevir
+        if arr.dtype != np.uint8:
+            if arr.max() <= 1.0:
+                arr = arr * 255.0
+            arr = np.clip(arr, 0, 255).astype(np.uint8)
+
+        # Tek kanallı maske: H x W
+        if arr.ndim == 2:
+            return Image.fromarray(arr)
+
+        # H x W x 1 maske
+        if arr.ndim == 3 and arr.shape[-1] == 1:
+            arr = arr.squeeze(-1)
+            return Image.fromarray(arr)
+
+        # RGB görüntü
+        if arr.ndim == 3 and arr.shape[-1] == 3:
+            return Image.fromarray(arr)
+
+        # RGBA görüntü
+        if arr.ndim == 3 and arr.shape[-1] == 4:
+            return Image.fromarray(arr)
+
+    raise TypeError(f"Desteklenmeyen görüntü tipi: {type(image_data)}")
+
+
+def save_image_safely(image_data, save_path: Path) -> None:
+    """
+    PIL Image veya numpy array formatındaki görüntüyü
+    güvenli şekilde PNG olarak kaydeder.
+    """
+    image = to_pil_image(image_data)
+    image.save(save_path)
+
+
+def pil_to_png_bytes(image_data) -> bytes:
+    """
+    PIL Image veya numpy array formatındaki görüntüyü
+    indirilebilir PNG byte verisine çevirir.
+    """
+    image = to_pil_image(image_data)
 
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
@@ -81,6 +127,7 @@ st.set_page_config(
 )
 
 st.title("Semantic Style Transfer")
+
 st.write(
     "Content fotoğrafını ve style görselini yükle. "
     "Uygulama görselleri otomatik hazırlar ve semantic style transfer sonucunu üretir."
@@ -109,16 +156,17 @@ with col2:
         help="Stil alınacak tablo/desen/sanat görselini yükle."
     )
 
-
 with st.expander("Kullanım bilgisi"):
     st.markdown(
         """
         **Desteklenen formatlar:** `.jpg`, `.jpeg`, `.png`
 
-        **Content fotoğrafı:** İnsan olan ana fotoğraf olmalı.  
+        **Content fotoğrafı:** İnsan olan ana fotoğraf olmalı.
+
         **Style görseli:** Van Gogh, Monet, Picasso, tablo, desen veya renkli sanat görseli olabilir.
 
         Görseller otomatik olarak:
+
         - RGB formatına çevrilir
         - `384 x 384` boyutuna getirilir
         - `inputs/content.png` ve `inputs/style.png` olarak kaydedilir
@@ -149,7 +197,6 @@ if style_file is not None:
         save_path=INPUT_DIR / "style.png",
         image_size=IMAGE_SIZE
     )
-
 
 if content_image is not None or style_image is not None:
     st.markdown("## Yüklenen Görseller")
@@ -210,6 +257,7 @@ if run_button:
 
     st.success("Style Transfer tamamlandı.")
 
+
     # ========================================================
     # ÇIKTILARI KAYDET
     # ========================================================
@@ -218,9 +266,10 @@ if run_button:
     full_nst_path = OUTPUT_DIR / "full_style_transfer.png"
     semantic_result_path = OUTPUT_DIR / "semantic_style_transfer_result.png"
 
-    result["person_mask"].save(person_mask_path)
-    result["full_styled_image"].save(full_nst_path)
-    result["semantic_image"].save(semantic_result_path)
+    save_image_safely(result["person_mask"], person_mask_path)
+    save_image_safely(result["full_styled_image"], full_nst_path)
+    save_image_safely(result["semantic_image"], semantic_result_path)
+
 
     # ========================================================
     # SONUÇLARI GÖSTER
@@ -276,7 +325,7 @@ inputs/style.png
 outputs/person_mask.png
 outputs/full_style_transfer.png
 outputs/semantic_style_transfer_result.png
-""",
+            """,
             language="text"
         )
 
