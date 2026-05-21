@@ -1,5 +1,6 @@
 # Semantic Style Transfer with Person Preservation
 
+
 Bu proje, bir **content image** ve bir **style image** kullanarak Neural Style Transfer işlemi yapar. Klasik stil aktarımından farklı olarak, görüntüdeki insan bölgesi tespit edilir ve mümkün olduğunca korunur. Böylece stil daha çok arka plana uygulanır; kişi, yüz ve vücut bölgesi daha doğal kalır.
 
 Proje sade bir OOP yapısıyla hazırlanmıştır. Hem **Streamlit arayüzü** ile kullanılabilir hem de terminal üzerinden `main.py` dosyasıyla çalıştırılabilir.
